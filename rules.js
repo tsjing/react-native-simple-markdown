@@ -5,7 +5,8 @@ import _ from 'lodash'
 
 export default (styles) => ({
   autolink: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       return createElement(Text, {
         key: state.key,
@@ -15,7 +16,8 @@ export default (styles) => ({
     }
   },
   blockQuote: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       const blockBar = createElement(View, {
         key: state.key,
@@ -29,7 +31,8 @@ export default (styles) => ({
     }
   },
   br: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       return createElement(Text, {
         key: state.key,
         style: styles.br
@@ -37,7 +40,8 @@ export default (styles) => ({
     }
   },
   codeBlock: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       return createElement(Text, {
         key: state.key,
@@ -46,7 +50,8 @@ export default (styles) => ({
     }
   },
   del: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       return createElement(Text, {
         key: state.key,
@@ -55,7 +60,8 @@ export default (styles) => ({
     }
   },
   em: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       return createElement(Text, {
         key: state.key,
@@ -64,22 +70,28 @@ export default (styles) => ({
     }
   },
   heading: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
+      const stylesToApply = [styles.heading, styles['heading' + node.level]]
+      state.stylesToApply = stylesToApply
       return createElement(Text, {
         key: state.key,
-        style: [styles.heading, styles['heading' + node.level]]
+        style: stylesToApply
       }, output(node.content, state))
     }
   },
   hr: {
-    react: (node, output, state) => {
-      return createElement(View, { key: state.key, style: styles.hr })
+    react: (node, output, parentState) => {
+        const state = {...parentState}
+        return createElement(View, { key: state.key, style: styles.hr })
     }
   },
   image: {
-    react: (node, output, state) => {
-      return createElement(Image, {
+    react: (node, output, parentState) => {
+        const state = {...parentState}
+
+        return createElement(Image, {
         key: state.key,
         resizeMode: styles.resizeMode ? styles.resizeMode : 'contain',
         source: { uri: node.target },
@@ -88,7 +100,8 @@ export default (styles) => ({
     }
   },
   inlineCode: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       return createElement(Text, {
         key: state.key,
@@ -97,7 +110,8 @@ export default (styles) => ({
     }
   },
   link: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       const openUrl = (url) => {
         Linking.openURL(url).catch(error => console.warn('An error occurred: ', error))
@@ -110,7 +124,9 @@ export default (styles) => ({
     }
   },
   list: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
+
       const items = _.map(node.items, (item, i) => {
         let bullet
         if (node.ordered) {
@@ -129,7 +145,8 @@ export default (styles) => ({
     }
   },
   newline: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       return createElement(Text, {
         key: state.key,
         style: styles.newline
@@ -137,7 +154,8 @@ export default (styles) => ({
     }
   },
   paragraph: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       return createElement(Text, {
         key: state.key,
         style: styles.paragraph
@@ -145,7 +163,8 @@ export default (styles) => ({
     }
   },
   strong: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       return createElement(Text, {
         key: state.key,
@@ -154,7 +173,8 @@ export default (styles) => ({
     }
   },
   table: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       const headers = _.map(node.header, (content, i) => {
         return createElement(Text, {
           style: styles.tableHeaderCell
@@ -179,7 +199,8 @@ export default (styles) => ({
     }
   },
   text: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       // Breaking words up in order to allow for text reflowing in flexbox
       let words = node.content.split(' ')
       words = _.map(words, (word, i) => {
@@ -187,6 +208,7 @@ export default (styles) => ({
         i != words.length - 1 ? word = word + ' ' : null
         const textStyles = [styles.text]
         !state.withinText ? textStyles.push(styles.plainText) : null
+        state.stylesToApply ? textStyles.push(state.stylesToApply) : null
         return createElement(Text, {
           style: textStyles
         }, word)
@@ -195,7 +217,8 @@ export default (styles) => ({
     }
   },
   u: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       return createElement(View, {
         key: state.key,
@@ -204,7 +227,8 @@ export default (styles) => ({
     }
   },
   url: {
-    react: (node, output, state) => {
+    react: (node, output, parentState) => {
+      const state = {...parentState}
       state.withinText = true
       const openUrl = (url) => {
         Linking.openURL(url).catch(error => console.warn('An error occurred: ', error))
